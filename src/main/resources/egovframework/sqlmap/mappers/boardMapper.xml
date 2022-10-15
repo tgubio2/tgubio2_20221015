@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 별명지정(중복만 안되면 됨) -->
+<!-- 이 sql 문장과 매핑될 인터페이스의 완전한 경로 -->
+<mapper namespace="kr.co.narrator.boardMapper">
+
+	<select id="getBoardList" resultType="kr.co.narrator.model.BoardVO">
+		SELECT
+			*
+		FROM
+			tbl_board
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="searchType=='title' and keyword != null and keyword != '' ">
+				AND TITLE like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='content' and keyword != null and keyword != '' ">
+				AND CONTENT like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='name' and keyword != null and keyword != '' ">
+				AND name like CONCAT('%', #{keyword}, '%')
+			</if>
+		</trim>
+		ORDER BY SEQ DESC
+		LIMIT #{startList}, #{listSize}
+	</select>
+	
+	<!-- 전체 글의 갯수를 읽어와 전체 페이지의 수를 계산 -->
+	<select id="getBoardListCnt" resultType="int">
+		SELECT
+			count(*) as listCnt
+		FROM
+			TBL_BOARD
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="keyword != null and keyword != '' ">
+			<if test="searchType=='title'">
+				AND TITLE like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='content'">
+				AND CONTENT like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='name'">
+				AND name like CONCAT('%', #{keyword}, '%')
+			</if>
+      </if>
+	</trim>
+	</select>
+
+	<select id="getBoardContent" resultType="kr.co.narrator.model.BoardVO" parameterType="kr.co.narrator.model.BoardVO">
+		SELECT
+			*
+		FROM
+			tbl_board
+		WHERE
+			SEQ = #{seq}
+	</select>
+
+	<insert id="insertBoard" parameterType="kr.co.narrator.model.BoardVO">
+		INSERT INTO TBL_BOARD (name, title, content, regdate, original_file_name, stored_file_name, file_size)
+		VALUES (
+			#{name}
+			, #{title}
+			, #{content}
+			, now()
+			, #{original_file_name}
+			, #{stored_file_name}
+			, #{file_size}
+		)
+	</insert>
+
+	<update id="updateBoard" parameterType="kr.co.narrator.model.BoardVO">
+		UPDATE TBL_BOARD SET
+			NAME = #{name}
+			, TITLE = #{title}
+			, CONTENT = #{content}
+			, REGDATE = now()
+		WHERE
+			SEQ = #{seq}
+	</update>
+
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM TBL_BOARD
+		WHERE SEQ = #{seq}
+	</delete>
+
+	<update id="updateViewCnt" parameterType="kr.co.narrator.model.BoardVO">
+		UPDATE TBL_BOARD SET
+			VIEW_CNT = VIEW_CNT + 1
+		WHERE
+			SEQ = #{seq}
+	</update>
+
+</mapper>

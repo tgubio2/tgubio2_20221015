@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.narrator.replyMapper">
+
+	<select id="getReplyList" resultType="kr.co.narrator.model.ReplyVO">
+		SELECT
+			RID
+			, SEQ
+			, CONTENT
+			, REG_ID
+			, REG_DT
+			, EDIT_DT
+		FROM
+			TBL_REPLY
+		WHERE
+			SEQ = #{seq}
+		ORDER BY REG_DT desc
+	</select>
+
+	<insert id="saveReply" parameterType="kr.co.narrator.model.ReplyVO">
+		INSERT INTO TBL_REPLY(SEQ, CONTENT, REG_ID, REG_DT, EDIT_DT)
+		VALUES (
+			#{seq}
+			, #{content}
+			, #{reg_id}
+			, now()
+			, now()
+		)
+	</insert>
+
+	<update id="updateReply" parameterType="kr.co.narrator.model.ReplyVO">
+		UPDATE TBL_REPLY SET
+			CONTENT = #{content}
+			, EDIT_DT = now()
+		WHERE
+			RID = #{rid}
+	</update>
+
+	<delete id="deleteReply" parameterType="int">
+		DELETE FROM TBL_REPLY
+		WHERE
+			RID = #{rid}
+	</delete>
+
+</mapper>
